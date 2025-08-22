@@ -1,4 +1,4 @@
-# superheroapi_test
+# Тестирование superheroapi
 Тестирование get запросов на go к api: superhero
 
 # Для запуска тестов через GitHub необходимо:
