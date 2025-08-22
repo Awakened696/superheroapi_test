@@ -24,6 +24,6 @@ jobs:
 
 
     - name: allure-test
-      run: cd ./...  && make test
+      run: make test
     - name: provider-test
-      run: cd ./... k && make test
+      run: make test
