@@ -22,29 +22,4 @@ jobs:
         go-version: '1.23'
 
     - name: Test
-      run: go test -v ./...  -allure-output allure-results 
-
-  build-allure-report:
-      runs-on: ubuntu-latest
-      needs: test # This job depends on the 'test' job
-      steps:
-        - uses: actions/checkout@v4
-  
-        - name: Download Allure Results Artifact
-          uses: actions/download-artifact@v4
-          with:
-            name: allure-results
-            path: allure-results
-  
-        - name: Set up Allure Commandline
-          uses: allure-framework/setup-allurectl@v1 # Use this action to set up allurectl
-  
-        - name: Generate Allure Report
-          run: allure generate allure-results --clean -o allure-report
-  
-        - name: Deploy Allure Report to GitHub Pages
-          uses: peaceiris/actions-gh-pages@v4 # Or a similar action for publishing
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: allure-report
-            publish_branch: gh-pages # Or your desired publishing branch
+      run: go test -v ./...
