@@ -21,9 +21,10 @@ jobs:
       with:
         go-version: '1.23'
 
-
-
-    - name: allure-test
-      run: make test
-    - name: provider-test
-      run: make test
+    - name: Test
+      run: go test -v ./... 
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-results
+        path: ./allure-results
