@@ -24,6 +24,6 @@ jobs:
 
 
     - name: allure-test
-      run: cd ./pkg/allure && make test
+      run: cd ./...  && make test
     - name: provider-test
-      run: cd ./pkg/framework && make test
+      run: cd ./... k && make test
