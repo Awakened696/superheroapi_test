@@ -2,33 +2,24 @@ package main
 
 import (
 	"testing"
+	"testapihoroes/internal"
+	"testapihoroes/helpers"
+	
 	"net/http"
-	"fmt"
-	"strconv"
+		
 	"github.com/ozontech/allure-go/pkg/framework/provider"
 	"github.com/ozontech/allure-go/pkg/framework/runner"
 )
 
-const (
-	base_url 			= 	"https://superheroapi.com/api/4b3e7de93f96e6c75ce7e09a504a7c6b/"
-	url_search 			= 	"https://superheroapi.com/api/4b3e7de93f96e6c75ce7e09a504a7c6b/search/"
-	url_without_access 	= 	"https://superheroapi.com/api/"
-	powerstats 			= 	"/powerstats"
-	biography 			= 	"/biography"
-	appearance 			= 	"/appearance"
-	work 				= 	"/work"
-	connections 		= 	"/connections"
-	image 				= 	"/image"
-)
-
 func TestGetId(t *testing.T) {
+	client := internal.NewAPIClient(internal.Base_url)
 	runner.Run(t, "Get hero with id=66", func(t provider.T) {
 		t.Parallel()
 		t.Description(`
 		Получение кода ответа 200 при запросе к api по id 66
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "66", "")
+		response, _ := client.GetHero("66", "")
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusOK
@@ -42,7 +33,7 @@ func TestGetId(t *testing.T) {
 		Получение кода ответа 200 при запросе к api по id 500 и powerstats
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "500", powerstats)
+		response, _ := client. GetHero("500", internal.Powerstats)
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusOK
@@ -56,7 +47,7 @@ func TestGetId(t *testing.T) {
 		Получение кода ответа 200 при запросе к api по id 489 и biography
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "489", biography)
+		response, _ := client.GetHero("489", internal.Biography)
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusOK
@@ -70,7 +61,7 @@ func TestGetId(t *testing.T) {
 		Получение кода ответа 200 при запросе к api по id 202 и appearance
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "202", appearance)
+		response, _ := client.GetHero("202", internal.Appearance)
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusOK
@@ -84,7 +75,7 @@ func TestGetId(t *testing.T) {
 		Получение кода ответа 200 при запросе к api по id 156 и work
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "156", work)
+		response, _ := client.GetHero("156", internal.Work)
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusOK
@@ -98,7 +89,7 @@ func TestGetId(t *testing.T) {
 		Получение кода ответа 200 при запросе к api по id 28 и connections
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "28", connections)
+		response, _ := client.GetHero("28", internal.Connections)
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusOK
@@ -112,21 +103,24 @@ func TestGetId(t *testing.T) {
 		Получение кода ответа 200 при запросе к api по id 707 и image
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "707", "/image")
+		response, _ := client.GetHero("707", "/image")
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusOK
 		t.NewStep("Шаг 3. Сравниваем ожидаемый ответ запроса и реальный")
 		assertStatus(t, got, want)
 	})
-	
+}
+
+func TestGetSearch(t *testing.T){
+	client := internal.NewAPIClient(internal.Url_search)	
 	runner.Run(t, "Get search hero with name=batman", func(t provider.T) {
 		t.Parallel()
 		t.Description(`
 		Получение кода ответа 200 при запросе к api по name batman
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(url_search, "", "batman")
+		response, _ := client.GetHero("", "batman")
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusOK
@@ -136,13 +130,14 @@ func TestGetId(t *testing.T) {
 }
 
 func TestGetError(t *testing.T) {
+	client := internal.NewAPIClient(internal.Base_url)
 	runner.Run(t, "Get not found hero id", func(t provider.T) {
 		t.Parallel()
 		t.Description(`
 		Получение кода ответа 404 при запросе к api по не существующему id
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "1000", "")
+		response, _ := client.GetHero("1000", "")
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusNotFound
@@ -156,7 +151,7 @@ func TestGetError(t *testing.T) {
 		Получение кода ответа 404 при запросе к api без указания id
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "", image)
+		response, _ := client.GetHero("", internal.Image)
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusNotFound
@@ -166,11 +161,12 @@ func TestGetError(t *testing.T) {
 	
 	runner.Run(t, "Access denied", func(t provider.T) {
 		t.Parallel()
+		client := internal.NewAPIClient(internal.Url_without_access)
 		t.Description(`
 		Получение кода ответа 403 при запросе к api без указания токена доступа
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(url_without_access, "1", image)
+		response, _ := client.GetHero("1", internal.Image)
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusForbidden 
@@ -185,7 +181,7 @@ func TestGetError(t *testing.T) {
 		Получение кода ответа 400 при запросе к api c указанием некоректного endpoint
 		`)
 		t.NewStep("Шаг 1. Получаем ответ на запрос")
-		response := GetHero(base_url, "321", "/artwe")
+		response, _ := client.GetHero("321", "/artwe")
 		t.NewStep("Шаг 2. Указываем реальный ответ запроса и ожидаемый")
 		got := response.StatusCode
 		want := http.StatusBadRequest
@@ -201,7 +197,7 @@ func TestMatchingHeroes(t *testing.T) {
 		Сравниваем power Superman с Hulk
 		`)
 		t.NewStep("Шаг 1. Записываем в got результат сравнения двух героев")
-		got := matchHeroes("644", "332")
+		got := helpers.MatchHeroes("644", "332")
 		want := "Hero One stronger Hero Two"
 		t.NewStep("Шаг 2. Сравниваем реальный результат с ожидаемым")
 		assertMatchingHero(t, got, want)
@@ -213,7 +209,7 @@ func TestMatchingHeroes(t *testing.T) {
 		Сравниваем power Iron Man с Pyro
 		`)
 		t.NewStep("Шаг 1. Записываем в got результат сравнения двух героев")
-		got := matchHeroes("532", "346")
+		got := helpers.MatchHeroes("532", "346")
 		want := "Hero Two stronger Hero One"
 		t.NewStep("Шаг 2. Сравниваем реальный результат с ожидаемым")
 		assertMatchingHero(t, got, want)
@@ -225,49 +221,17 @@ func TestMatchingHeroes(t *testing.T) {
 		Сравниваем power Emma Frost с Zatanna
 		`)
 		t.NewStep("Шаг 1. Записываем в got результат сравнения двух героев")
-		got := matchHeroes("241", "730")
+		got := helpers.MatchHeroes("241", "730")
 		want := "Hero One equal in power Hero Two"
 		t.NewStep("Шаг 2. Сравниваем реальный результат с ожидаемым")
 		assertMatchingHero(t, got, want)
 	})
 }
 
-func matchHeroes(id1, id2 string) string{
-	number1 := strInint(id1)
-	number2 := strInint(id2)
-	
-	got := ""
-	if number1 > number2 {
-		got = "Hero One stronger Hero Two"
-	} else if number1 < number2{
-		got = "Hero Two stronger Hero One"
-	}else {
-		got = "Hero One equal in power Hero Two"
-	}
-	return got
+func assertStatus(t provider.T, got, want int) {
+	t.Assert().Equal(got, want, "Did not get correct status")
 }
 
-func strInint(id string) int {
-	var item Item
-	s := GetPowerHeroes(id, item)
-	
-	number, err := strconv.Atoi(s.Power)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return number
-}
-
-func assertStatus(t testing.TB, got, want int) {
-	t.Helper()
-	if got != want {
-		t.Errorf("did not get correct status, got %d, want %d", got, want)
-	}
-}
-
-func assertMatchingHero(t testing.TB, got, want string) {
-	t.Helper()
-	if got != want {
-		t.Errorf("got %s, want %s", got, want)
-	}
+func assertMatchingHero(t provider.T, got, want string) {
+	t.Assert().Equal(got, want, "Assertion Failed")
 }
